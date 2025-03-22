@@ -1,0 +1,5 @@
+# Redirect domain aliases to primary domain
+https://www.cliniquesoinssm.com/* https://cliniquesoinssm.com/:splat 301!
+
+# Handle 404
+/* /index.html 200
