@@ -18,7 +18,23 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const totalProducts = products.length;
-  const itemsToShow = 3;
+  // Utiliser un hook pour détecter la taille de l'écran
+  const [itemsToShow, setItemsToShow] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsToShow(window.innerWidth < 768 ? 1 : 3);
+    };
+
+    // Définir la valeur initiale
+    handleResize();
+
+    // Ajouter l'écouteur d'événement
+    window.addEventListener('resize', handleResize);
+
+    // Nettoyer l'écouteur d'événement
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fonction pour créer un tableau circulaire des produits
   // Cela garantit que le carrousel ne montre jamais un écran blanc
@@ -97,6 +113,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
 
   return (
     <div className="relative w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-12">
       {/* Flèche gauche */}
       <button 
         onClick={prevSlide}
@@ -109,14 +126,14 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
       {/* Carrousel */}
       <div 
         ref={carouselRef} 
-        className="flex justify-center gap-4 px-12"
+        className="flex gap-4 w-full"
         style={{
           transform: `translateX(calc(-${currentIndex * (100 / itemsToShow)}% - ${currentIndex * 16}px))`,
           transition: 'transform 500ms ease-out'
         }}
       >
         {circularProducts.map((product, index) => (
-          <div key={index} className="w-1/3 h-[400px] flex-shrink-0">
+          <div key={index} className={`${itemsToShow === 1 ? 'w-full' : 'w-1/3'} h-[400px] flex-shrink-0 flex-grow-0`}>
             <div className="relative h-full w-full overflow-hidden rounded-lg shadow-xl">
               <img 
                 src={product.image} 
@@ -173,6 +190,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
             aria-label={`Aller à l'image ${index + 1}`}
           />
         ))}
+      </div>
       </div>
     </div>
   );
